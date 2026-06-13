@@ -1,9 +1,18 @@
 import {NextResponse, NextRequest} from "next/server";
-import User from "@/models/User";
 import connectDB from "@/dbConfig/dbConfig";
+import { helperSignUp } from "@/services/userAuth/signup";
 connectDB();
+
+
 export async function POST(request: NextRequest) {
-    const body = await request.json();
-    console.log(body);
-    return NextResponse.json({message: "User signed up successfully"});
+    try{
+
+        let response = await helperSignUp(request);
+        return response;
+
+    } catch (error:any) {
+        console.log("Error in signup route");
+        // console.log(error);
+        return NextResponse.json({message: "Error occurred while signing up user"}, {status: 500});
+    }
 }

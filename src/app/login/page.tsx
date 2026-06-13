@@ -1,7 +1,13 @@
 'use client'
 import { useState } from "react";
-
+import axios, { isAxiosError } from "axios";
+import {useRouter} from "next/navigation";
+import { useContext } from "react";
+import userContext from "@/contexts/user/userContext";
 export default function LoginPage() {
+    const router = useRouter();
+    const { setUser } = useContext(userContext);
+
     let [credentails, setCredentials] = useState({
         email: "",
         password: "",
@@ -11,13 +17,31 @@ export default function LoginPage() {
             return  { ...prev, [e.target.name]: e.target.value }
         });
     }
-    let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    let onSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+      try{
+
         e.preventDefault();
         console.log(credentails);
+        const localCreds = credentails; 
         setCredentials({
             email: "",
             password: "",
         });
+        const reponse = await axios.post("/api/user/login", localCreds);
+        console.log(reponse);
+        if(reponse.data?.user){
+          setUser(reponse.data.user);
+        }
+        router.push("/profile");
+      }catch(error:any){
+        if(isAxiosError(error)){
+          console.log(error.response?.data?.message || error.message);
+          return;
+        }else{
+          console.log("Error occurred while logging in user, in catch block");
+        }
+      }
+
     }
   return (<>
     <h1 className="text-2xl font-bold text-center mt-10">Login Page</h1>

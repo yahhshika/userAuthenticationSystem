@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-
+import axios, { isAxiosError } from "axios";
 export default function SignPage() {
     let [credentails, setCredentials] = useState({
         name: "",
@@ -12,14 +12,30 @@ export default function SignPage() {
             return  { ...prev, [e.target.name]: e.target.value }
         });
     }
-    let onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    let onSubmit =async (e: React.FormEvent<HTMLFormElement>) => {
+      try{
+
         e.preventDefault();
         console.log(credentails);
+        let localCreds = credentails;
         setCredentials({
             name: "",
             email: "",
             password: "",
         });
+        let res = await axios.post("/api/user/signup", localCreds)
+        console.log(res);
+        if(res.status === 200){
+          console.log("User signed up successfully");
+        }
+       
+      }catch(error:any){
+        if(isAxiosError(error)){
+          console.log(error.response?.data?.message || error.message);
+          return;
+        }
+        console.log("Error occurred while signing up user, in catch block"); 
+      }
     }
   return (<>
     <h1 className="text-2xl font-bold text-center mt-10">Sign Up Page</h1>
