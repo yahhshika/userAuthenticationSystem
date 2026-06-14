@@ -2,14 +2,35 @@
 import {useRouter} from "next/navigation";
 import {useContext, useEffect} from "react";
 import userContext from "@/contexts/user/userContext";
+import axios, {isAxiosError} from "axios";
+
 export default function ProfilePage(){
     const router = useRouter();
-    const {user} = useContext(userContext);
-    useEffect(() => {
-        if(!user){
-            router.push("/login");
+    const {user, setUser} = useContext(userContext);
+    useEffect(()=>{
+
+        const fetchUserData = async() => {
+     
+            const response =await axios.get("/api/user/auth");
+
+            if(response.data?.user){
+                setUser(response.data.user);
+            }else{
+                router.push("/login");
+            }
+            
         }
-    }, [user]);
+        fetchUserData().catch((error)=>{
+            if(isAxiosError(error)){
+                console.log("axios error in profile page:", error.response?.data.message || error.message);
+                router.push("/login");
+                return;
+            }
+            console.error("Error fetching user data:", error);
+            router.push("/login");
+        })
+    },[]);
+
 
     const handleLogout = async() => {
         try{
@@ -31,7 +52,7 @@ export default function ProfilePage(){
         :
         <div className="flex flex-col items-center justify-center h-screen gap-6">
 
-            ProfilePage
+            Welcome, {user?.name} <br />
             <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded w-1/6">
                 Logout
             </button>

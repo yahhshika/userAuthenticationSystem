@@ -1,7 +1,13 @@
 'use client'
 import { useState } from "react";
 import axios, { isAxiosError } from "axios";
+import {useRouter} from "next/navigation";
+import { useContext } from "react";
+import userContext from "@/contexts/user/userContext";
+
 export default function SignPage() {
+    const router = useRouter();
+    const { setUser } = useContext(userContext);
     let [credentails, setCredentials] = useState({
         name: "",
         email: "",
@@ -27,6 +33,10 @@ export default function SignPage() {
         console.log(res);
         if(res.status === 200){
           console.log("User signed up successfully");
+        }
+        if(res.data?.user){
+          setUser(res.data.user);
+          router.push("/profile");
         }
        
       }catch(error:any){
