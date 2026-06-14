@@ -43,6 +43,25 @@ export default function ProfilePage(){
         }
     };
 
+    const handleVerifyEmail = async() => {
+        try{
+            const response = await axios.get("/api/user/verify-email");
+            if(response.data?.message){
+                console.log(response.data.message);
+            }
+
+        }catch(error){
+            if(isAxiosError(error)){
+                console.log("axios error in verify email:", error.response?.data.message || error.message);
+                console.log(error.response);
+                return;
+            }
+            console.error("Error in verify email");
+
+        }
+
+    }
+
     
 
     return <>
@@ -56,9 +75,11 @@ export default function ProfilePage(){
             <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded w-1/6">
                 Logout
             </button>
-            <button className="bg-green-500 text-white px-4 py-2 rounded w-1/6">
+            {!(user?.isVerified) &&
+            <button onClick={handleVerifyEmail} className="bg-green-500 text-white px-4 py-2 rounded w-1/6">
                 Verify Email
             </button>
+            }
         </div>
     }
     </>
