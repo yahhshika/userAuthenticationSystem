@@ -62,6 +62,23 @@ export default function ProfilePage(){
 
     }
 
+    const resetPassButtonHandler = async()=>{
+        try{
+
+            const response = await axios("/api/user/pass");
+            if(response.data?.message){
+                console.log(response.data.message);
+            }
+        }catch(error:any){
+            if(isAxiosError(error)){
+                console.log("axios error in resetting the pass: ", error.response?.data?.messsage || error.message);
+                return;
+            }else{
+                console.log("error in resetting the pass");
+            }
+        }
+    }
+
     
 
     return <>
@@ -80,6 +97,9 @@ export default function ProfilePage(){
                 Verify Email
             </button>
             }
+            <button onClick={resetPassButtonHandler} className="bg-green-500 text-black px-4 py-2 rounded w-1/6">
+                Reset Password
+            </button>
         </div>
     }
     </>

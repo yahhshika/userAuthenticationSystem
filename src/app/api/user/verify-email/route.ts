@@ -6,6 +6,10 @@ import crypto from "crypto";
 connectDB();
 export async function GET(request: NextRequest) {
     try{
+        const response = await checkUserAuthentication(request as any);
+        if(!response.isAuthenticated){
+            return new Response(JSON.stringify({message: response.message}), {status: 401});
+        }
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -13,10 +17,6 @@ export async function GET(request: NextRequest) {
                 pass: process.env.EMAIL_PASSWORD
             }
         });
-        const response = await checkUserAuthentication(request as any);
-        if(!response.isAuthenticated){
-            return new Response(JSON.stringify({message: response.message}), {status: 401});
-        }
         
         const user = response.user;
         const token = crypto.randomBytes(32).toString("hex");
